@@ -64,14 +64,24 @@ const AudioPlayer = () => {
     setIsPlaying(!isPlaying);
   };
 
-  const changeCurrentTime = (e) => {
- 
+  const handleProgressBarClick = (e) => {
     const audio = audioRef.current;
-    const newTime = (e.target.value / 100) * duration;
-    console.log(newTime)
+    const progressBar = e.target;
+    const rect = progressBar.getBoundingClientRect();
+    const offsetX = e.clientX - rect.left;
+    const newTime = (offsetX / progressBar.clientWidth) * duration;
     audio.currentTime = newTime;
     setCurrentTime(newTime);
   };
+
+  // const changeCurrentTime = (e) => {
+ 
+  //   const audio = audioRef.current;
+  //   const newTime = (e.target.value / 100) * duration;
+  //   console.log(newTime)
+  //   audio.currentTime = newTime;
+  //   setCurrentTime(newTime);
+  // };
   
   const handleVolumeBarClick = (e) => {
     const audio = audioRef.current;
@@ -122,14 +132,26 @@ const AudioPlayer = () => {
                 </h3>
               </div>
             </div>
-            <div className="audio-player-progress" data-appear="fade-right">
+            <div
+              className="audio-player-progress"
+              data-appear="fade-right"
+              onClick={handleProgressBarClick}
+            >
+              <div
+                className="audio-player-progress-bar"
+                style={{
+                  width: `${(currentTime / duration) * 100}%`,backgroundColor:"blue" ,height:"100%"
+                }}
+              ></div>
+            </div>
+            {/* <div className="audio-player-progress" data-appear="fade-right">
               <input
                 type="range"
                 className="audio-player-progress-bar"
                 value={(currentTime / duration) * 100 || 0}
                 onChange={changeCurrentTime}
               />
-            </div>
+            </div> */}
             <div className="audio-bottom">
               <div
                 className="audio-time"
