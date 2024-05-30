@@ -1,9 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
-import "./audio.css"; // Ensure this CSS file contains the necessary styles
-import { FaPlay, FaPause, FaDownload, FaVolumeUp } from "react-icons/fa";
+
+import { useState, useEffect, useRef } from "react";
+import "./audio.css";
+import { FaPlay, FaPause } from "react-icons/fa";
+import { RiDownloadLine } from "react-icons/ri";
+import { PiSpeakerSimpleNoneFill } from "react-icons/pi";
 
 const AudioPlayer = () => {
   const audioRef = useRef(new Audio());
+  // console.log(audioRef)
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -44,13 +48,16 @@ const AudioPlayer = () => {
 
   useEffect(() => {
     const audio = audioRef.current;
+     console.log(audio)
     audio.volume = volume; // Update volume whenever it changes
+    console.log(volume)
   }, [volume]);
 
   const togglePlayback = () => {
     const audio = audioRef.current;
     if (isPlaying) {
       audio.pause();
+ 
     } else {
       audio.play();
     }
@@ -58,16 +65,25 @@ const AudioPlayer = () => {
   };
 
   const changeCurrentTime = (e) => {
+ 
     const audio = audioRef.current;
     const newTime = (e.target.value / 100) * duration;
+    console.log(newTime)
     audio.currentTime = newTime;
     setCurrentTime(newTime);
   };
-
-  const changeVolume = (e) => {
-    const newVolume = e.target.value / 100;
-    setVolume(newVolume);
+  
+  const handleVolumeBarClick = (e) => {
+    const audio = audioRef.current;
+    const newVolume = e.nativeEvent.offsetX / e.target.clientWidth;
+    console.log(newVolume)
+    audio.volume=newVolume;
+    setVolume(audio.volume);
   };
+  // const changeVolume = (e) => {
+  //   const newVolume = e.target.value / 100;
+  //   setVolume(newVolume);
+  // };
 
   const showTime = (s) => {
     const m = Math.floor(s / 60);
@@ -84,7 +100,7 @@ const AudioPlayer = () => {
               className="audio-image-box"
               style={{
                 backgroundImage:
-                  "url('https://data.whicdn.com/images/16602597/large.png')",
+                  "url('https://buffer.com/cdn-cgi/image/w=1000,fit=contain,q=90,f=auto/library/content/images/size/w600/2023/10/free-images.jpg')",
               }}
             ></div>
           </div>
@@ -146,7 +162,7 @@ const AudioPlayer = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <FaDownload />
+              <RiDownloadLine />
                 </a>
               </div>
               <div className="audio_vol">
@@ -156,16 +172,16 @@ const AudioPlayer = () => {
                   data-appear-delay="300"
                 >
                   <div className="audio-volume-icon">
-                    <FaVolumeUp />
-                  </div>
+                  <PiSpeakerSimpleNoneFill />
                   <div className="audio-volume">
-                    <input
-                      type="range"
-                      className="audio-volume-bar"
-                      value={volume * 100}
-                      onChange={changeVolume}
-                    />
+                
+                    <div className="audio-volume-bar" onClick={handleVolumeBarClick}>
+                      <div style={{width:`${volume*100}%` ,backgroundColor:"blue",height:"100%" ,marginTop: "3px"} }></div>
+
+                    </div>
                   </div>
+                  </div>
+                 
                 </div>
               </div>
             </div>
