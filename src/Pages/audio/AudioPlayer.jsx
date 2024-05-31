@@ -1,31 +1,22 @@
-
 import { useState, useEffect, useRef } from "react";
 import "./audio.css";
 import { FaPlay, FaPause } from "react-icons/fa";
 import { RiDownloadLine } from "react-icons/ri";
 import { PiSpeakerSimpleNoneFill } from "react-icons/pi";
+import { saveAs } from "file-saver";
 
 const AudioPlayer = () => {
   const audioRef = useRef(new Audio());
-  // console.log(audioRef)
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [volume, setVolume] = useState(0.75);
+  const audioSrc =
+    "https://cdn.pixabay.com/audio/2023/01/18/audio_43b48c0a90.mp3";
 
   useEffect(() => {
     const audio = audioRef.current;
-
-    if (audio.canPlayType("audio/mpeg;")) {
-      audio.type = "audio/mpeg";
-      audio.src =
-        "https://cdn.pixabay.com/audio/2023/01/18/audio_43b48c0a90.mp3";
-    } else {
-      audio.type = "audio/ogg";
-      audio.src =
-        "https://faderlab.com/codepen-assets/audio-player/leftbehind.ogg";
-    }
-
+    audio.src = audioSrc;
     audio.preload = "auto";
 
     audio.addEventListener("loadeddata", () => {
@@ -38,7 +29,7 @@ const AudioPlayer = () => {
       setCurrentTime(audio.currentTime);
     });
 
-    audio.volume = volume; // Set initial volume
+    audio.volume = volume;
 
     return () => {
       audio.removeEventListener("loadeddata", () => {});
@@ -48,16 +39,15 @@ const AudioPlayer = () => {
 
   useEffect(() => {
     const audio = audioRef.current;
-     console.log(audio)
-    audio.volume = volume; // Update volume whenever it changes
-    console.log(volume)
+    console.log(audio);
+    audio.volume = volume;
+    console.log(volume);
   }, [volume]);
 
   const togglePlayback = () => {
     const audio = audioRef.current;
     if (isPlaying) {
       audio.pause();
- 
     } else {
       audio.play();
     }
@@ -65,47 +55,40 @@ const AudioPlayer = () => {
   };
 
   const handleProgressBarClick = (e) => {
+    console.log(e);
     const audio = audioRef.current;
+    let pro=document.getElementsByClassName('audio-player-progress')[0]
     const progressBar = e.target;
     const rect = progressBar.getBoundingClientRect();
     const offsetX = e.clientX - rect.left;
-    const newTime = (offsetX / progressBar.clientWidth) * duration;
+    const newTime = (offsetX / pro.clientWidth) * duration;
     audio.currentTime = newTime;
     setCurrentTime(newTime);
   };
-
-  // const changeCurrentTime = (e) => {
- 
-  //   const audio = audioRef.current;
-  //   const newTime = (e.target.value / 100) * duration;
-  //   console.log(newTime)
-  //   audio.currentTime = newTime;
-  //   setCurrentTime(newTime);
-  // };
-  
   const handleVolumeBarClick = (e) => {
+    // console.log(e)
+    let vol=document.getElementsByClassName('audio-volume-bar')[0]
     const audio = audioRef.current;
-    const newVolume = e.nativeEvent.offsetX / e.target.clientWidth;
-    console.log(newVolume)
-    audio.volume=newVolume;
+
+    const newVolume = e.nativeEvent.offsetX /vol.clientWidth;
+    console.log(newVolume);
+    audio.volume = newVolume;
     setVolume(audio.volume);
   };
-  // const changeVolume = (e) => {
-  //   const newVolume = e.target.value / 100;
-  //   setVolume(newVolume);
-  // };
-
   const showTime = (s) => {
     const m = Math.floor(s / 60);
     s = Math.floor(s % 60);
     return `${m < 10 ? "0" + m : m}:${s < 10 ? "0" + s : s}`;
+  };
+  const handleDownload = () => {
+    saveAs(audioSrc, "audio.mp3");
   };
 
   return (
     <div className="container">
       <div className="audio-player">
         <div id="audio-player" className="audio-player-wrapper">
-          <div className="audio-player-image" data-appear="fade-right">
+          <div className="audio-player-image">
             <div
               className="audio-image-box"
               style={{
@@ -116,16 +99,12 @@ const AudioPlayer = () => {
           </div>
           <div className="audio-player-controls">
             <div className="audio-top">
-              <div className="audio-date" data-appear="fade-left">
+              <div className="audio-date">
                 <span className="audio-day">07</span>
                 <span className="audio-month">Aug</span>
               </div>
 
-              <div
-                className="audio-title"
-                data-appear="fade-left"
-                data-appear-delay="75"
-              >
+              <div className="audio-title">
                 <h3>
                   <span>Rameses B</span>
                   <span className="audio-title">Left Behind</span>
@@ -134,37 +113,21 @@ const AudioPlayer = () => {
             </div>
             <div
               className="audio-player-progress"
-              data-appear="fade-right"
               onClick={handleProgressBarClick}
             >
               <div
                 className="audio-player-progress-bar"
                 style={{
-                  width: `${(currentTime / duration) * 100}%`,backgroundColor:"blue" ,height:"100%"
+                  width: `${(currentTime / duration) * 100}%`,
+                  backgroundColor: "blue",
+                  height: "100%",
                 }}
               ></div>
             </div>
-            {/* <div className="audio-player-progress" data-appear="fade-right">
-              <input
-                type="range"
-                className="audio-player-progress-bar"
-                value={(currentTime / duration) * 100 || 0}
-                onChange={changeCurrentTime}
-              />
-            </div> */}
+
             <div className="audio-bottom">
-              <div
-                className="audio-time"
-                data-appear="fade-left"
-                data-appear-delay="75"
-              >
-                {showTime(currentTime)}
-              </div>
-              <div
-                className="audio-player-button-wrappers"
-                data-appear="fade-left"
-                data-appear-delay="150"
-              >
+              <div className="audio-time">{showTime(currentTime)}</div>
+              <div className="audio-player-button-wrappers">
                 <div className="audio-player-button" onClick={togglePlayback}>
                   {isPlaying ? (
                     <FaPause className="icon-pause" />
@@ -173,37 +136,32 @@ const AudioPlayer = () => {
                   )}
                 </div>
               </div>
-              <div
-                className="audio-download"
-                data-appear="fade-left"
-                data-appear-delay="225"
-              >
-                <a
-                  href="https://soundcloud.com/ramesesb/rameses-b-left-behind"
-                  title="Download"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-              <RiDownloadLine />
-                </a>
+              <div className="audio-download">
+                <RiDownloadLine
+                  onClick={handleDownload}
+                  className="audio_download_btn"
+                />
               </div>
               <div className="audio_vol">
-                <div
-                  className="audio-volume-wrapper"
-                  data-appear="fade-left"
-                  data-appear-delay="300"
-                >
+                <div className="audio-volume-wrapper">
                   <div className="audio-volume-icon">
-                  <PiSpeakerSimpleNoneFill />
-                  <div className="audio-volume">
-                
-                    <div className="audio-volume-bar" onClick={handleVolumeBarClick}>
-                      <div style={{width:`${volume*100}%` ,backgroundColor:"blue",height:"100%" ,marginTop: "3px"} }></div>
-
+                    <PiSpeakerSimpleNoneFill />
+                    <div className="audio-volume">
+                      <div
+                        className="audio-volume-bar"
+                        onClick={handleVolumeBarClick}
+                      >
+                        <div
+                          style={{
+                            width: `${volume * 100}%`,
+                            backgroundColor: "blue",
+                            height: "100%",
+                            marginTop: "3px",
+                          }}
+                        ></div>
+                      </div>
                     </div>
                   </div>
-                  </div>
-                 
                 </div>
               </div>
             </div>
